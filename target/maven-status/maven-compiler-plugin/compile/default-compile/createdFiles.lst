@@ -1,0 +1,9 @@
+com\model\Categories.class
+com\model\Tracker.class
+com\tracker\gui\CategoriesGUI.class
+com\tracker\dao\TrackerDAO.class
+com\tracker\gui\MainFrame.class
+com\tracker\gui\TrackerGUI.class
+com\tracker\util\DatabaseConnection.class
+com\tracker\dao\CategoriesDAO.class
+com\tracker\Main.class
