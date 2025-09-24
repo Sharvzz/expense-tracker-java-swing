@@ -14,7 +14,7 @@ public class CategoriesDAO {
             ResultSet rs = stmt.executeQuery(query);
         ){
             while(rs.next()){
-                Categories category = new Categories(rs.getString("category_name"));
+                Categories category = new Categories(rs.getString("name"));
                 category.setCategoryId(rs.getInt("category_id"));
                 categories.add(category);
             }
@@ -24,7 +24,7 @@ public class CategoriesDAO {
 
 
     public int addCategory(Categories category) throws SQLException{
-        String query = "INSERT INTO categories (category_name) VALUES (?)";
+        String query = "INSERT INTO categories (name) VALUES (?)";
         try(
             Connection conn = DatabaseConnection.getDBConnection();
             PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
