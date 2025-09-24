@@ -45,4 +45,20 @@ public class CategoriesDAO {
         }
     }
 
+    public int getCategoryIdByName(String name) throws SQLException{
+        String query = "SELECT category_id FROM categories WHERE name = ?";
+        try(
+            Connection conn = DatabaseConnection.getDBConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query);
+        ){
+            pstmt.setString(1, name);
+            try(ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    return rs.getInt("category_id");
+                }
+                throw new SQLException("Category not found: " + name);
+            }
+        }
+    }
+
 }

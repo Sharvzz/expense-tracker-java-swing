@@ -34,6 +34,12 @@ public class MainFrame extends JFrame {
             CategoriesGUI addCategoryDialog = new CategoriesGUI(); // no-arg constructor
             addCategoryDialog.setVisible(true);
         });
+
+        // Open TrackerGUI when Add Expense is clicked
+        addExpenseButton.addActionListener(e -> {
+            TrackerGUI trackerGUI = new TrackerGUI();
+            trackerGUI.setVisible(true);
+        });
     }
 
     public static void main(String[] args) {

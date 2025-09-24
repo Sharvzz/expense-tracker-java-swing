@@ -7,7 +7,7 @@ import com.model.Tracker;
 public class TrackerDAO {
     public List<Tracker> getAllTrackers() throws SQLException {
         List<Tracker> trackers = new ArrayList<>();
-        String query = "SELECT * FROM trackers";
+        String query = "SELECT * FROM expenses";
         try (Connection conn = DatabaseConnection.getDBConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -26,7 +26,7 @@ public class TrackerDAO {
         return trackers;
     }
     public int addTracker(Tracker tracker) throws SQLException {
-        String query = "INSERT INTO trackers (category_id, type, amount, description, expense_date, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO expenses (category_id, type, amount, description, expense_date, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getDBConnection();
              PreparedStatement pstmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, tracker.getCategoryId());
