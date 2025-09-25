@@ -27,7 +27,7 @@ public class TrackerGUI extends JFrame{
         trackerDAO = new TrackerDAO();
 
         setTitle("Expense Tracker");
-        setSize(400,300);
+        setSize(900,400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -145,17 +145,22 @@ public class TrackerGUI extends JFrame{
     private void loadExpenses(){
         try{
             List<Tracker> trackers = trackerDAO.getAllTrackers();
-            String[] columnNames = {"Expense ID","Category ID","Type","Amount","Description","Expense Date","Created At"};
-            Object[][] data = new Object[trackers.size()][7];
+            List<Categories> categories = categoriesDAO.getAllCategories();
+            String[] columnNames = {"Expense ID","Category ID"," Category Name","Type","Amount","Description","Expense Date","Created At"};
+            Object[][] data = new Object[trackers.size()][8];
             for(int i=0;i<trackers.size();i++){
                 Tracker t = trackers.get(i);
                 data[i][0] = t.getExpenseId();
                 data[i][1] = t.getCategoryId();
-                data[i][2] = t.getType();
+                data[i][2] = categories.stream()
+                                   .filter(c -> c.getCategoryId() == t.getCategoryId())
+                                   .map(Categories::getCategoryName)
+                                   .findFirst()
+                                   .orElse("Unknown");
                 data[i][3] = t.getAmount();
                 data[i][4] = t.getDescription();
                 data[i][5] = t.getExpenseDate();
-                data[i][6] = t.getCreatedAt();
+                data[i][7] = t.getCreatedAt();
             }
             expensesTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
         }catch(SQLException e){
