@@ -45,6 +45,35 @@ public class CategoriesDAO {
         }
     }
 
+    public void deleteCategory(int categoryId) throws SQLException{
+        String query = "DELETE FROM categories WHERE category_id = ?";
+        try(
+            Connection conn = DatabaseConnection.getDBConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query);
+        ){
+            pstmt.setInt(1, categoryId);
+            int isDeleted = pstmt.executeUpdate();
+            if(isDeleted==0){
+                throw new SQLException("Deleting category failed, no rows affected.");
+            }
+        }
+    }
+
+    public void updateCategory(Categories category) throws SQLException{
+        String query = "UPDATE categories SET name = ? WHERE category_id = ?";
+        try(
+            Connection conn = DatabaseConnection.getDBConnection();
+            PreparedStatement pstmt = conn.prepareStatement(query);
+        ){
+            pstmt.setString(1, category.getCategoryName());
+            pstmt.setInt(2, category.getCategoryId());
+            int isUpdate = pstmt.executeUpdate();
+            if(isUpdate==0){
+                throw new SQLException("Updating category failed, no rows affected.");
+            }
+        }
+    }
+
     public int getCategoryIdByName(String name) throws SQLException{
         String query = "SELECT category_id FROM categories WHERE name = ?";
         try(
