@@ -23,7 +23,7 @@ public class CategoriesGUI extends JFrame {
 
     public CategoriesGUI() {
         setTitle("Categories Management");
-        setSize(400, 300);
+        setSize(800, 300);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

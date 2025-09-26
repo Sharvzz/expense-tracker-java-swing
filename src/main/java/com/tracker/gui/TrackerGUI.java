@@ -16,7 +16,9 @@ public class TrackerGUI extends JFrame{
     private JTextField descriptionField;
     private JTextField dateField;
     private JButton addButton;
-
+    private JButton deleteExpense;
+    private JButton updateExpense;
+    private JButton refreshExpenses;
     private CategoriesDAO categoriesDAO;
     private TrackerDAO trackerDAO;
     private JTable expensesTable;
@@ -38,32 +40,99 @@ public class TrackerGUI extends JFrame{
     private void initComponents(){
         setLayout(new BorderLayout());
 
-        JPanel formPanel = new JPanel(new GridLayout(3,4,10,10));
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); // padding around components
 
-        formPanel.add(new JLabel("Type:"));
+        // Type row
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        formPanel.add(new JLabel("Type:"), gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         typeComboBox = new JComboBox<>(new String[]{"Income","Expense"});
-        formPanel.add(typeComboBox);
+        formPanel.add(typeComboBox, gbc);
 
-        formPanel.add(new JLabel("Category:"));
+        // Category row
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        formPanel.add(new JLabel("Category:"), gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         categoryComboBox = new JComboBox<>();
         loadCategories();
-        formPanel.add(categoryComboBox);
+        formPanel.add(categoryComboBox, gbc);
 
-        formPanel.add(new JLabel("Amount:"));
+        // Amount row
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        formPanel.add(new JLabel("Amount:"), gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         amountField = new JTextField();
-        formPanel.add(amountField);
+        formPanel.add(amountField, gbc);
 
-        formPanel.add(new JLabel("Description:"));
+        // Description row
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        formPanel.add(new JLabel("Description:"), gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         descriptionField = new JTextField();
-        formPanel.add(descriptionField);
+        formPanel.add(descriptionField, gbc);
 
-        formPanel.add(new JLabel("Date (YYYY-MM-DD):"));
+        // Date row
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        formPanel.add(new JLabel("Date (YYYY-MM-DD):"), gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
         dateField = new JTextField();
-        formPanel.add(dateField);
+        formPanel.add(dateField, gbc);
 
+        // Buttons row
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
         addButton = new JButton("Add Entry");
         addButton.addActionListener(e -> saveRecord());
-        formPanel.add(addButton);
+        formPanel.add(addButton, gbc);
+
+        gbc.gridx = 1;
+        deleteExpense = new JButton("Delete Entry");
+        deleteExpense.addActionListener(e -> deleteExpense());
+        formPanel.add(deleteExpense, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        updateExpense = new JButton("Update Entry");
+        updateExpense.addActionListener(e -> updateExpense());
+        formPanel.add(updateExpense, gbc);
+
+        gbc.gridx = 1;
+        refreshExpenses = new JButton("Refresh");
+        refreshExpenses.addActionListener(e -> loadExpenses());
+        formPanel.add(refreshExpenses, gbc);
 
         add(formPanel, BorderLayout.NORTH);
 
@@ -163,8 +232,86 @@ public class TrackerGUI extends JFrame{
                 data[i][7] = t.getCreatedAt();
             }
             expensesTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames));
+            loadCategories();
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error loading expenses: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+    private void deleteExpense(){
+        int selectedRow = expensesTable.getSelectedRow();
+        if(selectedRow == -1){
+            JOptionPane.showMessageDialog(this, "Please select an expense to delete.", "Selection Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int expenseId = (int) expensesTable.getValueAt(selectedRow, 0);
+        try{
+            trackerDAO.deleteTracker(expenseId);
+            JOptionPane.showMessageDialog(this, "Expense deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            loadExpenses();
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Error deleting expense: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void updateExpense(){
+        int selectedRow = expensesTable.getSelectedRow();
+        if(selectedRow == -1){
+            JOptionPane.showMessageDialog(this, "Please select an expense to update.", "Selection Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        int expenseId = (int) expensesTable.getValueAt(selectedRow, 0);
+        String type = (String) typeComboBox.getSelectedItem();
+        String categoryName = (String) categoryComboBox.getSelectedItem();
+        String amountText = amountField.getText();
+        String description = descriptionField.getText();
+        String dateText = dateField.getText();
+
+        if (amountText.isEmpty() || description.isEmpty() || dateText.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill all fields!");
+            return;
+        }
+
+        if (categoryName == null) {
+            JOptionPane.showMessageDialog(this, "Please select a category!");
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(amountText);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Invalid amount!");
+            return;
+        }
+
+        try {
+            LocalDate expenseDate = LocalDate.parse(dateText);
+
+            int categoryId = categoriesDAO.getCategoryIdByName(categoryName);
+
+            Tracker tracker = new Tracker();
+            tracker.setExpenseId(expenseId);
+            tracker.setCategoryId(categoryId);
+            tracker.setType(type);
+            tracker.setAmount((float) amount);
+            tracker.setDescription(description);
+            tracker.setExpenseDate(expenseDate);
+
+            trackerDAO.updateTracker(tracker);
+
+            JOptionPane.showMessageDialog(this, "Record updated successfully! ID: " + expenseId);
+
+            // Clear fields
+            amountField.setText("");
+            descriptionField.setText("");
+            dateField.setText("");
+
+            loadExpenses();
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error updating record: " + ex.getMessage());
+        }
+    }
+
 }

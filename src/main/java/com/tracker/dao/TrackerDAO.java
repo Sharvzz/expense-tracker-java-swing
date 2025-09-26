@@ -48,4 +48,36 @@ public class TrackerDAO {
             }
         } 
     }
+
+    public void deleteTracker(int expenseId) throws SQLException {
+        String query = "DELETE FROM expenses WHERE expense_id = ?";
+        try (Connection conn = DatabaseConnection.getDBConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query))
+        {
+            pstmt.setInt(1, expenseId);
+            int isDeleted = pstmt.executeUpdate();
+            if(isDeleted==0){
+                throw new SQLException("Deleting tracker failed, no rows affected.");
+            }
+        }
+    }
+
+    public void updateTracker(Tracker tracker) throws SQLException {
+        String query = "UPDATE expenses SET category_id = ?, type = ?, amount = ?, description = ?, expense_date = ? WHERE expense_id = ?";
+        try (Connection conn = DatabaseConnection.getDBConnection();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, tracker.getCategoryId());
+            pstmt.setString(2, tracker.getType());
+            pstmt.setFloat(3, tracker.getAmount());
+            pstmt.setString(4, tracker.getDescription());
+            pstmt.setDate(5, Date.valueOf(tracker.getExpenseDate()));
+            pstmt.setInt(6, tracker.getExpenseId());
+            int rowsAffected = pstmt.executeUpdate();
+            if(rowsAffected==0){
+                throw new SQLException("Updating tracker failed, no rows affected.");
+            }
+        }
+    }
+
+
 }
