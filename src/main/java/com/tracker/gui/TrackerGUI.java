@@ -19,6 +19,7 @@ public class TrackerGUI extends JFrame{
     private JButton deleteExpense;
     private JButton updateExpense;
     private JButton refreshExpenses;
+    private JButton addCategory;
     private CategoriesDAO categoriesDAO;
     private TrackerDAO trackerDAO;
     private JTable expensesTable;
@@ -133,6 +134,17 @@ public class TrackerGUI extends JFrame{
         refreshExpenses = new JButton("Refresh");
         refreshExpenses.addActionListener(e -> loadExpenses());
         formPanel.add(refreshExpenses, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+
+        addCategory = new JButton("Add Category");
+        addCategory.addActionListener(e -> {
+            CategoriesGUI addCategoryDialog = new CategoriesGUI();
+            addCategoryDialog.setVisible(true);
+        });
+
+        formPanel.add(addCategory, gbc);
 
         add(formPanel, BorderLayout.NORTH);
 
